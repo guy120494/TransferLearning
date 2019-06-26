@@ -33,6 +33,7 @@ def main():
     model.add(tf.keras.layers.Conv2D(filters=2, kernel_size=(3, 3), activation='relu'))
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.Dense(activation='relu', units=50))
+    model.add(tf.keras.layers.Dense(activation='relu', units=30))
     model.add(tf.keras.layers.Dense(activation='softmax', units=10))
 
     model.compile(loss=tf.keras.losses.categorical_crossentropy,
