@@ -1,6 +1,7 @@
 # 3. Import libraries and modules
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 NUMBER_OF_LABELS = 10
 
@@ -38,12 +39,19 @@ def main():
 
     model.compile(loss=tf.keras.losses.categorical_crossentropy,
                   optimizer=tf.keras.optimizers.Adadelta(), metrics=['accuracy'])
-    model.fit(x=train_data, y=train_labels, batch_size=10, epochs=5, verbose=1)
+    history = model.fit(x=train_data, y=train_labels, batch_size=10, epochs=8, verbose=1)
 
     result = model.predict(test_data[0:10])
     result = [np.argmax(r) for r in result]
     print("predictions: " + str(result))
     print("actual: " + str([np.argmax(l) for l in test_labels[0:10]]))
+
+    plt.plot(history.history['acc'])
+    plt.title('Model accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    plt.show()
 
 
 if __name__ == '__main__':
