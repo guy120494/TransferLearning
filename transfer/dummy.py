@@ -9,6 +9,7 @@ MNIST_IMAGE_SIZE = 28
 
 np.random.seed(123)  # for reproducibility
 
+
 def main():
     fac = 0.99 / 255
     mnist = tf.keras.datasets.mnist
@@ -31,17 +32,17 @@ def main():
 
     model = tf.keras.models.Sequential()
 
-    model.add(tf.keras.models.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape))
+    model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape))
 
-    model.add(tf.keras.models.Conv2D(64, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu'))
 
-    model.add(tf.keras.models.MaxPooling2D(pool_size=(2, 2)))
+    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(tf.keras.models.Flatten())
+    model.add(tf.keras.layers.Flatten())
 
-    model.add(tf.keras.models.Dense(128, activation='relu'))
+    model.add(tf.keras.layers.Dense(128, activation='relu'))
 
-    model.add(tf.keras.models.Dense(NUMBER_OF_LABELS, activation='softmax'))
+    model.add(tf.keras.layers.Dense(NUMBER_OF_LABELS, activation='softmax'))
 
     model.compile(loss=tf.keras.losses.categorical_crossentropy, optimizer=tf.keras.optimizers.SGD, metrics=['accuracy'])
 
