@@ -44,7 +44,7 @@ def main():
 
     model.add(tf.keras.layers.Dense(NUMBER_OF_LABELS, activation='softmax'))
 
-    model.compile(loss=tf.keras.losses.categorical_crossentropy, optimizer=tf.keras.optimizers.SGD, metrics=['accuracy'])
+    model.compile(loss=tf.keras.losses.categorical_crossentropy, optimizer=tf.keras.optimizers.SGD(), metrics=['accuracy'])
 
     history = model.fit(x=train_data, y=train_labels, batch_size=128, epochs=10, verbose=1,
                         validation_split=0.1)
