@@ -9,7 +9,6 @@ MNIST_IMAGE_SIZE = 28
 
 np.random.seed(123)  # for reproducibility
 
-
 def main():
     fac = 0.99 / 255
     mnist = tf.keras.datasets.mnist
@@ -36,20 +35,18 @@ def main():
 
     model.add(tf.keras.models.Conv2D(64, (3, 3), activation='relu'))
 
-    # reduce dim, choose best
     model.add(tf.keras.models.MaxPooling2D(pool_size=(2, 2)))
 
-    #model.add(Dropout(0.25))
     model.add(tf.keras.models.Flatten())
 
     model.add(tf.keras.models.Dense(128, activation='relu'))
 
-    #model.add(Dropout(0.5))
     model.add(tf.keras.models.Dense(NUMBER_OF_LABELS, activation='softmax'))
+
     model.compile(loss=tf.keras.losses.categorical_crossentropy, optimizer=tf.keras.optimizers.SGD, metrics=['accuracy'])
 
     history = model.fit(x=train_data, y=train_labels, batch_size=128, epochs=10, verbose=1,
-                        validation_data=(test_data, test_labels))
+                        validation_split=0.1)
 
     plt.plot(history.history['acc'])
     plt.title('Model accuracy')
