@@ -1,6 +1,6 @@
-import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
+import tensorflow as tf
 
 from transfer.config.config import NUMBER_OF_LABELS
 from transfer.datasets.data_builder import get_mnist_data
