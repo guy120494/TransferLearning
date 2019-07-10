@@ -16,13 +16,14 @@ def get_cifar10_data():
 
 
 def get_data_from_dataset(dataset, image_shape):
-    fac = 0.99 / 255
     (train_data, train_labels), (test_data, test_labels) = dataset.load_data()
 
-    train_data = train_data.reshape(train_data.shape[0], image_shape[0], image_shape[0], image_shape[2])
-    test_data = test_data.reshape(test_data.shape[0], image_shape[0], image_shape[0], image_shape[2])
-    train_data = train_data * fac + 0.01
-    test_data = test_data * fac + 0.01
+    train_data = train_data.reshape(train_data.shape[0], image_shape[0], image_shape[1], image_shape[2])
+    test_data = test_data.reshape(test_data.shape[0], image_shape[0], image_shape[1], image_shape[2])
+    train_data = train_data.astype('float32')
+    test_data = test_data.astype('float32')
+    train_data = train_data / 255
+    test_data = test_data / 255
 
     train_labels = tf.keras.utils.to_categorical(train_labels, num_classes=NUMBER_OF_LABELS)
     test_labels = tf.keras.utils.to_categorical(test_labels, num_classes=NUMBER_OF_LABELS)

@@ -11,11 +11,11 @@ np.random.seed(123)  # for reproducibility
 def build_base_model():
     input_shape, train_data, train_labels, test_data, test_labels = get_mnist_data()
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Conv2D(5, kernel_size=(3, 3), activation='relu', input_shape=input_shape))
-    model.add(tf.keras.layers.Conv2D(5, (3, 3), activation='relu'))
+    model.add(tf.keras.layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape))
+    model.add(tf.keras.layers.Conv2D(64, (3, 3), activation='relu', name='mid'))
     model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(tf.keras.layers.Flatten())
-    # model.add(tf.keras.layers.Dense(128, activation='relu'))
+    model.add(tf.keras.layers.Dense(128, activation='relu'))
     model.add(tf.keras.layers.Dense(NUMBER_OF_LABELS, activation='softmax'))
 
     model.compile(loss=tf.keras.losses.categorical_crossentropy, optimizer=tf.keras.optimizers.SGD(),
@@ -23,9 +23,9 @@ def build_base_model():
 
     history = model.fit(x=train_data, y=train_labels, batch_size=128, epochs=5, verbose=1)
 
-    score = model.evaluate(test_data, test_labels, verbose=0)
+    model.evaluate(test_data, test_labels, verbose=0)
     plot_accuracy(history.history['acc'], 'model-accuracy-train')
-    # plot_accuracy(score[1], 'model-accuracy-test')
+
     return model
 
 
