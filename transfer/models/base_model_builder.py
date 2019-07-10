@@ -21,7 +21,7 @@ def build_base_model():
     model.compile(loss=tf.keras.losses.categorical_crossentropy, optimizer=tf.keras.optimizers.SGD(),
                   metrics=['accuracy'])
 
-    history = model.fit(x=train_data, y=train_labels, batch_size=128, epochs=5, verbose=1)
+    history = model.fit(x=train_data, y=train_labels, batch_size=128, epochs=15, verbose=1)
 
     model.evaluate(test_data, test_labels, verbose=0)
     plot_accuracy(history.history['acc'], 'model-accuracy-train')
