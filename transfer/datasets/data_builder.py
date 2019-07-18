@@ -45,4 +45,7 @@ def get_mnist_compatible_cifar10():
 
 
 def rgb2gray(rgb):
-    return np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
+    red_factor = 0.2989
+    green_factor = 0.5870
+    blue_factor = 0.1140
+    return np.dot(rgb[..., :3], [red_factor, green_factor, blue_factor])
