@@ -1,10 +1,11 @@
 import logging
 
 import numpy as np
-from decision_tree_with_bagging import DecisionTreeWithBaggingRegressor
 from scipy.sparse import lil_matrix
 from sklearn import linear_model, ensemble
 from sklearn.metrics import accuracy_score
+
+from transfer.smoothness.decision_tree_with_bagging import DecisionTreeWithBaggingRegressor
 
 
 class WaveletsForestRegressor:
