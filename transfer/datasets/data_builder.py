@@ -33,13 +33,20 @@ def get_data_from_dataset(dataset, image_shape):
 
 
 def get_mnist_compatible_cifar10():
-    input_shape, train_data, train_labels, test_data, test_labels = get_cifar10_data()
+    _, train_data, train_labels, test_data, test_labels = get_cifar10_data()
 
     train_data = [rgb2gray(sample) for sample in train_data]
     test_data = [rgb2gray(test_sample) for test_sample in test_data]
 
-    train_data = [resize(image=sample, output_shape=MNIST_IMAGE_SIZE) for sample in train_data]
-    test_data = [resize(image=test_sample, output_shape=MNIST_IMAGE_SIZE) for test_sample in test_data]
+    train_data = np.array([resize(image=sample, output_shape=MNIST_IMAGE_SIZE) for sample in train_data]).reshape(
+        len(train_data),
+        MNIST_IMAGE_SIZE[0],
+        MNIST_IMAGE_SIZE[1], MNIST_IMAGE_SIZE[2])
+    test_data = np.array(
+        [resize(image=test_sample, output_shape=MNIST_IMAGE_SIZE) for test_sample in test_data]).reshape(
+        len(test_data),
+        MNIST_IMAGE_SIZE[0],
+        MNIST_IMAGE_SIZE[1], MNIST_IMAGE_SIZE[2])
 
     return MNIST_IMAGE_SIZE, train_data, train_labels, test_data, test_labels
 
