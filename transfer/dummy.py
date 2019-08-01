@@ -6,6 +6,7 @@ import tensorflow as tf
 from tensorflow.python.keras.models import Model
 
 from transfer.datasets.data_builder import get_mnist_compatible_cifar10
+from transfer.models.dumb_model_builder import build_dumb_model
 from transfer.smoothness.random_forest import WaveletsForestRegressor
 
 
@@ -44,7 +45,7 @@ def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
 
 
 def main():
-    model: Model = tf.keras.models.load_model('base-model.h5')
+    model: Model = build_dumb_model()
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
 
     for i in range(10000, train_data.shape[0] + 1, 10000):
