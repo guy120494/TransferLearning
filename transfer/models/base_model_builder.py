@@ -42,11 +42,11 @@ def plot_accuracy(accuracy, filename):
     plt.savefig(filename, format='png')
 
 
-def print_confusion_matrix(model, test_data, test_labels):
+def get_confusion_matrix(model, test_data, test_labels):
     test_predictions = model.predict_classes(test_data)
     array = [0] * NUMBER_OF_LABELS
     for i in range(len(test_labels)):
         for j in range(len(test_labels[i])):
             array[i] += j * test_labels[i, j]
     cm = confusion_matrix(array, test_predictions)
-    print(cm)
+    return cm
