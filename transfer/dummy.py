@@ -1,5 +1,6 @@
 from typing import List
 
+import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.keras.models import Model
@@ -28,24 +29,34 @@ def build_fixed_layers_models(model: Model) -> List[Model]:
 def calc_smoothness(x, y):
     wfr = WaveletsForestRegressor(regressor='random_forest', criterion='mse', depth=9, trees=5)
     wfr.fit(x, y)
-    alpha, n_wavelets, errors = wfr.evaluate_smoothness(m=100)
+    alpha, n_wavelets, errors = wfr.evaluate_smoothness()
     return alpha
+
+
+def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
+    if x == 0:
+        x = range(1, len(y) + 1)
+    plt.plot(x, y)
+    plt.title(title)
+    plt.xlabel(xaxis)
+    plt.ylabel(yaxis)
+    plt.show()
 
 
 def main():
     model: Model = tf.keras.models.load_model('base-model.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
 
-    for i in range(1000, train_data.shape[0], 1000):
+    for i in range(10000, train_data.shape[0] + 1, 10000):
         models = build_fixed_layers_models(model)
 
         for j in range(len(models)):
             x_train = train_data[0:i]
             y_train = train_labels[0:i]
-            x_test = test_data[0:i]
-            y_test = test_labels[0:i]
+            x_test = test_data
+            y_test = test_labels
             alpha_vec = np.zeros((len(model.layers),))
-            models[j].fit(x=x_train, y=y_train, batch_size=128, epochs=15, verbose=1)
+            models[j].fit(x=x_train, y=y_train, batch_size=256, epochs=30, verbose=2)
             for idx, layer in enumerate(models[j].layers):
                 print('Calculating smoothness parameters for layer ' + str(idx) + '.')
                 get_layer_output = tf.keras.backend.backend.function([model.layers[0].input],
@@ -54,7 +65,13 @@ def main():
                 alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
                                                  y_train)
 
-            scores = models[j].evaluate(x=x_test, y=y_test)
+            score = models[j].evaluate(x=x_test, y=y_test)
+            np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data.npy', alpha_vec)
+
+            models[j].save(f'model_{j}_and_{i}_train_data.h5')
+
+            with open(f'test_loss_of_model_{j}_and_{i}_train_data.txt', 'w') as f:
+                f.write(f'{score}')
 
 
 if __name__ == '__main__':
