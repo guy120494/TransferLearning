@@ -70,7 +70,9 @@ def main():
 
             models[j].save(f'model_{j}_and_{i}_train_data.h5')
 
-            with open(f'test_loss_of_model_{j}_and_{i}_train_data.txt', 'w') as f:
+            with open(f'scores_of_model_{j}_and_{i}_train_data.txt', 'w') as f:
+                f.write(models[j].metrics_names)
+                f.write('\n')
                 f.write(f'{score}')
 
 
