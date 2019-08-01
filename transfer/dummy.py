@@ -16,11 +16,12 @@ def build_fixed_layers_models(model: Model) -> List[Model]:
         if not model.layers[i - 1].trainable_weights:
             continue
         frozen_model = tf.keras.models.clone_model(model)
+        for j in range(i):
+            frozen_model.layers[j].trainable = False
+
         frozen_model.compile(loss=tf.keras.losses.categorical_crossentropy, optimizer=tf.keras.optimizers.SGD(),
                              metrics=['accuracy'])
         frozen_model.set_weights(weights)
-        for j in range(i):
-            frozen_model.layers[j].trainable = False
         models_list.append(frozen_model)
 
     return models_list
