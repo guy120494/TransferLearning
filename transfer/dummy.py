@@ -44,7 +44,7 @@ def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
 
 
 def main():
-    model: Model = tf.keras.models.load_model('base-model.h5')
+    model: Model = tf.keras.models.load_model('../base_model.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
 
     for i in range(10000, train_data.shape[0] + 1, 10000):
