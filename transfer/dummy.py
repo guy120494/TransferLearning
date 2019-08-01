@@ -59,7 +59,7 @@ def main():
             models[j].fit(x=x_train, y=y_train, batch_size=256, epochs=30, verbose=2)
             for idx, layer in enumerate(models[j].layers):
                 print('Calculating smoothness parameters for layer ' + str(idx) + '.')
-                get_layer_output = tf.keras.backend.backend.function([model.layers[0].input],
+                get_layer_output = tf.keras.backend.function([model.layers[0].input],
                                                                      [model.layers[idx].output])
                 layer_output = get_layer_output([x_train])[0]
                 alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
