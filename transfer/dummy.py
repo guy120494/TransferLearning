@@ -72,7 +72,7 @@ def main():
             models[j].save(f'model_{j}_and_{i}_train_data.h5')
 
             with open(f'scores_of_model_{j}_and_{i}_train_data.txt', 'w') as f:
-                f.write(models[j].metrics_names)
+                f.write('\t'.join(models[j].metrics_names))
                 f.write('\n')
                 f.write(f'{score}')
 
