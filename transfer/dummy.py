@@ -45,10 +45,10 @@ def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
 
 
 def main():
-    model: Model = tf.keras.models.load_model('../base_model.h5')
+    model: Model = tf.keras.models.load_model(r'C:\Users\transfer2\PycharmProjects\TransferLearning\base_model.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
 
-    for i in range(10000, train_data.shape[0] + 1, 10000):
+    for i in range(1000, 5000 + 1, 1000):
         models = build_fixed_layers_models(model)
 
         for j in range(len(models)):
@@ -57,7 +57,7 @@ def main():
             x_test = test_data
             y_test = test_labels
             alpha_vec = np.zeros((len(model.layers),))
-            models[j].fit(x=x_train, y=y_train, batch_size=256, epochs=30, verbose=2)
+            models[j].fit(x=x_train, y=y_train, batch_size=64, epochs=30, verbose=2)
             for idx, layer in enumerate(models[j].layers):
                 print('Calculating smoothness parameters for layer ' + str(idx) + '.')
                 get_layer_output = tf.keras.backend.function([model.layers[0].input],
@@ -67,11 +67,11 @@ def main():
                                                  y_train)
 
             score = models[j].evaluate(x=x_test, y=y_test)
-            np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data.npy', alpha_vec)
+            np.save(fr'C:\Users\transfer2\PycharmProjects\TransferLearning\transfer\smoothness_vector_of_model_{j}_and_{i}_train_data.npy', alpha_vec)
 
-            models[j].save(f'model_{j}_and_{i}_train_data.h5')
+            models[j].save(fr'C:\Users\transfer2\PycharmProjects\TransferLearning\transfer\model_{j}_and_{i}_train_data.h5')
 
-            with open(f'scores_of_model_{j}_and_{i}_train_data.txt', 'w') as f:
+            with open(fr'C:\Users\transfer2\PycharmProjects\TransferLearning\transfer\scores_of_model_{j}_and_{i}_train_data.txt', 'w') as f:
                 f.write('\t'.join(models[j].metrics_names))
                 f.write('\n')
                 f.write(f'{score}')
