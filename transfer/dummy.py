@@ -45,7 +45,7 @@ def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
 
 
 def main():
-    model: Model = tf.keras.models.load_model(r'C:\Users\transfer2\PycharmProjects\TransferLearning\base_model.h5')
+    model: Model = tf.keras.models.load_model(r'../base_model.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
 
     for i in range(1000, 5000 + 1, 1000):
@@ -67,11 +67,11 @@ def main():
                                                  y_train)
 
             score = models[j].evaluate(x=x_test, y=y_test)
-            np.save(fr'C:\Users\transfer2\PycharmProjects\TransferLearning\transfer\smoothness_vector_of_model_{j}_and_{i}_train_data.npy', alpha_vec)
+            np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data.npy', alpha_vec)
 
-            models[j].save(fr'C:\Users\transfer2\PycharmProjects\TransferLearning\transfer\model_{j}_and_{i}_train_data.h5')
+            models[j].save(f'model_{j}_and_{i}_train_data.h5')
 
-            with open(fr'C:\Users\transfer2\PycharmProjects\TransferLearning\transfer\scores_of_model_{j}_and_{i}_train_data.txt', 'w') as f:
+            with open(f'scores_of_model_{j}_and_{i}_train_data.txt', 'w') as f:
                 f.write('\t'.join(models[j].metrics_names))
                 f.write('\n')
                 f.write(f'{score}')
