@@ -77,5 +77,47 @@ def main():
                 f.write(f'{score}')
 
 
+def make_accuracy_and_loss_graph_for_models():
+    x = [k for k in range(1, 5 + 1)]
+    trains = [1000, 2000, 3000, 4000, 5000, 10000, 20000]
+    colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y']
+    accuracies = []
+    losses = []
+    for j in trains:
+        accuracy = []
+        loss = []
+        for i in range(5):
+            with open(fr'scores_of_model_{i}_and_{j}_train_data.txt', 'r') as f:
+                lines = f.readlines()
+                scores = lines[1].replace('[', '').replace(']', '').split(',')
+                scores = [float(s) for s in scores]
+                loss.append(scores[0])
+                accuracy.append(scores[1])
+
+        accuracies.append(accuracy)
+        losses.append(loss)
+
+    plt.figure()
+    plt.xlabel('number of frozen layers')
+    plt.ylabel('accuracy')
+    plt.title(f'accuracy over models')
+    for i in range(len(accuracies)):
+        plt.plot(x, accuracies[i], color=colors[i], label=f'{trains[i]} train samples')
+    plt.legend(loc='lower left')
+    plt.savefig(f'accuracy over models')
+    plt.close()
+
+    plt.figure()
+    plt.xlabel('number of frozen layers')
+    plt.ylabel('loss')
+    plt.title(f'loss over models')
+    for i in range(len(accuracies)):
+        plt.plot(x, losses[i], color=colors[i], label=f'{trains[i]} train samples')
+    plt.legend(loc='upper left')
+    plt.savefig(f'loss over models')
+    plt.close()
+
+
 if __name__ == '__main__':
     main()
+    # make_accuracy_and_loss_graph_for_models()
