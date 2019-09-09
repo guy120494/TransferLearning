@@ -78,7 +78,7 @@ def main():
 
 
 def base_model_smoothness():
-    model: Model = tf.keras.models.load_model(r'../base_model.h5')
+    model: Model = tf.keras.models.load_model(r'base-model-thin.h5')
     # model: Model = tf.keras.models.load_model(r'model_3_and_20000_train_data.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_data()
     # train_data = train_data[0:20000]
@@ -141,6 +141,6 @@ def make_accuracy_and_loss_graph_for_models():
 
 
 if __name__ == '__main__':
-    # base_model_smoothness()
-    main()
+    base_model_smoothness()
+    # main()
     # make_accuracy_and_loss_graph_for_models()
