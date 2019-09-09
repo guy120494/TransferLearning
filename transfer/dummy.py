@@ -28,7 +28,7 @@ def build_fixed_layers_models(model: Model) -> List[Model]:
 
 
 def calc_smoothness(x, y):
-    wfr = WaveletsForestRegressor(regressor='random_forest', criterion='mse', depth=9, trees=5)
+    wfr = WaveletsForestRegressor(regressor='random_forest', criterion='mse', depth=9, trees=15)
     wfr.fit(x, y)
     alpha, n_wavelets, errors = wfr.evaluate_smoothness()
     return alpha
@@ -92,8 +92,8 @@ def base_model_smoothness():
         alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
                                          train_labels)
     score = model.evaluate(x=test_data, y=test_labels)
-    np.save(f'smoothness_vector_of_base_model.npy', alpha_vec)
-    with open(f'scores_of_base_model.txt', 'w') as f:
+    np.save(f'smoothness_vector_of_base_thin_model.npy', alpha_vec)
+    with open(f'scores_of_base_thin_model.txt', 'w') as f:
         f.write('\t'.join(model.metrics_names))
         f.write('\n')
         f.write(f'{score}')
