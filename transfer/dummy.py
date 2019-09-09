@@ -28,7 +28,7 @@ def build_fixed_layers_models(model: Model) -> List[Model]:
 
 
 def calc_smoothness(x, y):
-    wfr = WaveletsForestRegressor(regressor='random_forest', criterion='mse', depth=9, trees=15)
+    wfr = WaveletsForestRegressor(regressor='random_forest', criterion='mse', depth=9, trees=50)
     wfr.fit(x, y)
     alpha, n_wavelets, errors = wfr.evaluate_smoothness()
     return alpha
