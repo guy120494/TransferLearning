@@ -92,7 +92,7 @@ def base_model_smoothness():
         alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
                                          train_labels)
     score = model.evaluate(x=test_data, y=test_labels)
-    np.save(f'smoothness_vector_of_base_model.npy', alpha_vec)
+    np.save(f'smoothness_vector_of_base_thin_model.npy', alpha_vec)
     with open(f'scores_of_base_model.txt', 'w') as f:
         f.write('\t'.join(model.metrics_names))
         f.write('\n')
