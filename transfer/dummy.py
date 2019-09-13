@@ -37,15 +37,18 @@ def calc_smoothness(x, y):
 def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
     if x == 0:
         x = range(1, len(y) + 1)
+    a = plt.figure()
     plt.plot(x, y)
     plt.title(title)
     plt.xlabel(xaxis)
     plt.ylabel(yaxis)
-    plt.show()
+    # plt.show()
+    a.savefig(f'{title}')
 
 
 def main():
-    model: Model = tf.keras.models.load_model(r'../base_model.h5')
+    # model: Model = tf.keras.models.load_model(r'../base_model.h5')
+    model: Model = tf.keras.models.load_model(r'base-model-thin.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
     trains = [1000, 2000, 3000, 4000, 5000, 10000, 20000]
     for i in trains:
@@ -57,21 +60,25 @@ def main():
             x_test = test_data
             y_test = test_labels
             alpha_vec = np.zeros((len(model.layers),))
-            models[j].fit(x=x_train, y=y_train, batch_size=64, epochs=30, verbose=2)
+            models[j].fit(x=x_train, y=y_train, batch_size=64, epochs=40, verbose=2)
             for idx, layer in enumerate(models[j].layers):
                 print('Calculating smoothness parameters for layer ' + str(idx) + '.')
                 get_layer_output = tf.keras.backend.function([model.layers[0].input],
                                                                      [model.layers[idx].output])
-                layer_output = get_layer_output([train_data[0:20000]])[0]
-                alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
-                                                 train_labels[0:20000])
+                layer_output = get_layer_output([train_data])[0]
+                # alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
+                #                                  train_labels[0:20000])
+                alpha_vec[idx] = calc_smoothness(layer_output.reshape(layer_output.shape[0],
+                                                                      np.prod(layer_output.shape[1:])),
+                                                 train_labels)
 
             score = models[j].evaluate(x=x_test, y=y_test)
-            np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data_full.npy', alpha_vec)
+            np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data_new_reshape.npy', alpha_vec)
+            plot_vec(y=alpha_vec, title=f'Graph of model {j} and {i} train')
 
-            models[j].save(f'model_{j}_and_{i}_train_data_full.h5')
+            models[j].save(f'model_{j}_and_{i}_train_data_new_reshape.h5')
 
-            with open(f'scores_of_model_{j}_and_{i}_train_data_full.txt', 'w') as f:
+            with open(f'scores_of_model_{j}_and_{i}_train_data_new_reshape.txt', 'w') as f:
                 f.write('\t'.join(models[j].metrics_names))
                 f.write('\n')
                 f.write(f'{score}')
@@ -143,6 +150,6 @@ def make_accuracy_and_loss_graph_for_models():
 
 
 if __name__ == '__main__':
-    base_model_smoothness()
-    # main()
+    # base_model_smoothness()
+    main()
     # make_accuracy_and_loss_graph_for_models()
