@@ -45,7 +45,7 @@ def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
 
 
 def main():
-    model: Model = tf.keras.models.load_model(r'../base_model.h5')
+    model: Model = tf.keras.models.load_model(r'base-model-thin.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
     trains = [1000, 2000, 3000, 4000, 5000, 10000, 20000]
     for i in trains:
@@ -57,24 +57,25 @@ def main():
             x_test = test_data
             y_test = test_labels
             alpha_vec = np.zeros((len(model.layers),))
-            models[j].fit(x=x_train, y=y_train, batch_size=64, epochs=30, verbose=2)
+            currentModel = models[j]
+            currentModel.fit(x=x_train, y=y_train, batch_size=64, epochs=100, verbose=2)
             for idx, layer in enumerate(models[j].layers):
                 print('Calculating smoothness parameters for layer ' + str(idx) + '.')
-                get_layer_output = tf.keras.backend.function([model.layers[0].input],
-                                                                     [model.layers[idx].output])
-                layer_output = get_layer_output([train_data[0:20000]])[0]
-                alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
-                                                 train_labels[0:20000])
+                get_layer_output = tf.keras.backend.function([currentModel.layers[0].input],
+                                                             [currentModel.layers[idx].output])
+                # layer_output = get_layer_output([train_data[0:20000]])[0]
+                # alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
+                #                                  train_labels[0:20000])
 
-            score = models[j].evaluate(x=x_test, y=y_test)
-            np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data_full.npy', alpha_vec)
-
-            models[j].save(f'model_{j}_and_{i}_train_data_full.h5')
-
-            with open(f'scores_of_model_{j}_and_{i}_train_data_full.txt', 'w') as f:
-                f.write('\t'.join(models[j].metrics_names))
-                f.write('\n')
-                f.write(f'{score}')
+            score = currentModel.evaluate(x=x_test, y=y_test)
+            # np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data_full.npy', alpha_vec)
+            #
+            # models[j].save(f'model_{j}_and_{i}_train_data_full.h5')
+            #
+            # with open(f'scores_of_model_{j}_and_{i}_train_data_full.txt', 'w') as f:
+            #     f.write('\t'.join(models[j].metrics_names))
+            #     f.write('\n')
+            #     f.write(f'{score}')
 
 
 def base_model_smoothness():
@@ -89,10 +90,10 @@ def base_model_smoothness():
         get_layer_output = tf.keras.backend.function([model.layers[0].input],
                                                      [model.layers[idx].output])
         layer_output = get_layer_output([train_data])[0]
-        # alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
-        #                                  train_labels)
-        alpha_vec[idx] = calc_smoothness(layer_output.reshape(layer_output.shape[0], np.prod(layer_output.shape[1:])),
+        alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
                                          train_labels)
+        # alpha_vec[idx] = calc_smoothness(layer_output.reshape(layer_output.shape[0], np.prod(layer_output.shape[1:])),
+        #                                  train_labels)
     score = model.evaluate(x=test_data, y=test_labels)
     np.save(f'smoothness_vector_of_base_thin_model_new_reshape.npy', alpha_vec)
     with open(f'scores_of_base_thin_model_new_reshape.txt', 'w') as f:
@@ -143,6 +144,6 @@ def make_accuracy_and_loss_graph_for_models():
 
 
 if __name__ == '__main__':
-    base_model_smoothness()
-    # main()
+    # base_model_smoothness()
+    main()
     # make_accuracy_and_loss_graph_for_models()
