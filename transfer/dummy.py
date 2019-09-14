@@ -37,14 +37,17 @@ def calc_smoothness(x, y):
 def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
     if x == 0:
         x = range(1, len(y) + 1)
+    a = plt.figure()
     plt.plot(x, y)
     plt.title(title)
     plt.xlabel(xaxis)
     plt.ylabel(yaxis)
-    plt.show()
+    # plt.show()
+    a.savefig(f'{title}')
 
 
 def main():
+    # model: Model = tf.keras.models.load_model(r'../base_model.h5')
     model: Model = tf.keras.models.load_model(r'base-model-thin.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
     trains = [1000, 2000, 3000, 4000, 5000, 10000, 20000]
@@ -90,10 +93,10 @@ def base_model_smoothness():
         get_layer_output = tf.keras.backend.function([model.layers[0].input],
                                                      [model.layers[idx].output])
         layer_output = get_layer_output([train_data])[0]
-        alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
-                                         train_labels)
-        # alpha_vec[idx] = calc_smoothness(layer_output.reshape(layer_output.shape[0], np.prod(layer_output.shape[1:])),
+        # alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
         #                                  train_labels)
+        alpha_vec[idx] = calc_smoothness(layer_output.reshape(layer_output.shape[0], np.prod(layer_output.shape[1:])),
+                                         train_labels)
     score = model.evaluate(x=test_data, y=test_labels)
     np.save(f'smoothness_vector_of_base_thin_model_new_reshape.npy', alpha_vec)
     with open(f'scores_of_base_thin_model_new_reshape.txt', 'w') as f:
