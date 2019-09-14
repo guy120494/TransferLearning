@@ -66,9 +66,12 @@ def main():
                 print('Calculating smoothness parameters for layer ' + str(idx) + '.')
                 get_layer_output = tf.keras.backend.function([currentModel.layers[0].input],
                                                              [currentModel.layers[idx].output])
-                # layer_output = get_layer_output([train_data[0:20000]])[0]
+                layer_output = get_layer_output([train_data[0:20000]])[0]
                 # alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
                 #                                  train_labels[0:20000])
+                alpha_vec[idx] = calc_smoothness(layer_output.reshape(layer_output.shape[0],
+                                                                      np.prod(layer_output.shape[1:])),
+                                                 train_labels)
 
             score = currentModel.evaluate(x=x_test, y=y_test)
             # np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data_full.npy', alpha_vec)
