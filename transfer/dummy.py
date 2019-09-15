@@ -112,7 +112,7 @@ def base_model_smoothness():
 
 def make_accuracy_and_loss_graph_for_models():
     x = [k for k in range(1, 5 + 1)]
-    trains = [1000, 2000, 3000, 4000, 5000, 10000, 20000]
+    trains = [2000, 5000, 15000, 20000, 25000]
     colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y']
     accuracies = []
     losses = []
@@ -120,7 +120,7 @@ def make_accuracy_and_loss_graph_for_models():
         accuracy = []
         loss = []
         for i in range(5):
-            with open(fr'scores_of_model_{i}_and_{j}_train_data.txt', 'r') as f:
+            with open(fr'scores_of_model_{i}_and_{j}_train_data_new_reshape_and_base_better.txt', 'r') as f:
                 lines = f.readlines()
                 scores = lines[1].replace('[', '').replace(']', '').split(',')
                 scores = [float(s) for s in scores]
@@ -153,5 +153,5 @@ def make_accuracy_and_loss_graph_for_models():
 
 if __name__ == '__main__':
     # base_model_smoothness()
-    main()
-    # make_accuracy_and_loss_graph_for_models()
+    # main()
+    make_accuracy_and_loss_graph_for_models()
