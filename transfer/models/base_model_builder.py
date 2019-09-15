@@ -41,7 +41,7 @@ def build_base_thin_model():
     model.add(tf.keras.layers.Conv2D(16, kernel_size=(3, 3), activation='relu', name='mid'))
     model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(tf.keras.layers.Conv2D(8, kernel_size=(3, 3), activation='relu', name='third'))
-    model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
+    # model.add(tf.keras.layers.MaxPooling2D(pool_size=(2, 2)))
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.Dense(128, activation='relu'))
     model.add(tf.keras.layers.Dense(NUMBER_OF_LABELS, activation='softmax'))
@@ -53,7 +53,7 @@ def build_base_thin_model():
 
     model.evaluate(test_data, test_labels, verbose=0)
     plot_accuracy(history.history['acc'], 'model-accuracy-train-thin')
-    model.save(f'base-model-thin.h5')
+    model.save(f'base-model-thin-better.h5')
 
 
 def plot_accuracy(accuracy, filename):
