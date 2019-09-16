@@ -112,15 +112,15 @@ def base_model_smoothness():
 
 def make_accuracy_and_loss_graph_for_models():
     x = [k for k in range(1, 5 + 1)]
-    trains = [2000, 5000, 15000, 20000, 25000]
-    colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y']
+    trains = [100, 200, 300, 500, 1000, 1500, 2000, 3000, 4000, 5000, 10000, 15000]
+    colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y', 'indigo', 'firebrick', 'lightgreen', 'peru', 'gold']
     accuracies = []
     losses = []
     for j in trains:
         accuracy = []
         loss = []
         for i in range(5):
-            with open(fr'scores_of_model_{i}_and_{j}_train_data_new_reshape_and_base_better.txt', 'r') as f:
+            with open(fr'DanielDir/scores_of_model_{i}_and_{j}_train_data_new_reshape_and_base_better.txt', 'r') as f:
                 lines = f.readlines()
                 scores = lines[1].replace('[', '').replace(']', '').split(',')
                 scores = [float(s) for s in scores]
@@ -137,7 +137,7 @@ def make_accuracy_and_loss_graph_for_models():
     for i in range(len(accuracies)):
         plt.plot(x, accuracies[i], color=colors[i], label=f'{trains[i]} train samples')
     plt.legend(loc='lower left')
-    plt.savefig(f'accuracy over models')
+    plt.savefig(f'DanielDir/accuracy over models')
     plt.close()
 
     plt.figure()
@@ -147,7 +147,7 @@ def make_accuracy_and_loss_graph_for_models():
     for i in range(len(accuracies)):
         plt.plot(x, losses[i], color=colors[i], label=f'{trains[i]} train samples')
     plt.legend(loc='upper left')
-    plt.savefig(f'loss over models')
+    plt.savefig(f'DanielDir/loss over models')
     plt.close()
 
 
