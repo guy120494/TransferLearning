@@ -49,9 +49,8 @@ def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
 def main():
     # model: Model = tf.keras.models.load_model(r'../base_model.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
-    trains = [5000, 10000, 15000, 25000]
+    model: Model = tf.keras.models.load_model(r'Their/TheirModel.h5')
     for i in trains:
-        model: Model = tf.keras.models.load_model(r'base-model-thin-better.h5')
         models = build_fixed_layers_models(model)
 
         for j in range(len(models)):
@@ -62,7 +61,7 @@ def main():
             alpha_vec = np.zeros((len(model.layers),))
             current_model = models[j]
             current_model.fit(x=x_train, y=y_train, batch_size=64, epochs=100, verbose=2)
-            for idx, layer in enumerate(models[j].layers):
+            for idx, layer in enumerate(current_model.layers):
                 print('Calculating smoothness parameters for layer ' + str(idx) + '.')
                 get_layer_output = tf.keras.backend.function([current_model.layers[0].input],
                                                              [current_model.layers[idx].output])
@@ -74,20 +73,20 @@ def main():
                                                  train_labels)
 
             score = current_model.evaluate(x=x_test, y=y_test)
-            np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data_new_reshape_and_base_better.npy', alpha_vec)
-            plot_vec(y=alpha_vec, title=f'Graph of model {j} and {i} train and base better')
+            np.save(f'Their/smoothness_vector_of_their_{j}_model_and_{i}_train.npy', alpha_vec)
+            # plot_vec(y=alpha_vec, title=f'Graph of model {j} and {i} train and base better')
 
-            models[j].save(f'model_{j}_and_{i}_train_data_new_reshape_and_base_better.h5')
+            current_model.save(f'Their/their_{j}_model_and_{i}_train.h5')
 
-            with open(f'scores_of_model_{j}_and_{i}_train_data_new_reshape_and_base_better.txt', 'w') as f:
-                f.write('\t'.join(models[j].metrics_names))
+            with open(f'Their/scores_of_their_{j}_model_and_{i}_train.txt', 'w') as f:
+                f.write('\t'.join(current_model.metrics_names))
                 f.write('\n')
                 f.write(f'{score}')
 
 
 def base_model_smoothness():
-    model: Model = tf.keras.models.load_model(r'base-model-thin-better.h5')
-    # model: Model = tf.keras.models.load_model(r'model_3_and_20000_train_data.h5')
+    # model: Model = tf.keras.models.load_model(r'base-model-thin-better.h5')
+    model: Model = tf.keras.models.load_model(r'Their/TheirModel.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_data()
     # train_data = train_data[0:20000]
     # train_labels = train_labels[0:20000]
@@ -102,9 +101,9 @@ def base_model_smoothness():
         alpha_vec[idx] = calc_smoothness(layer_output.reshape(layer_output.shape[0], np.prod(layer_output.shape[1:])),
                                          train_labels)
     score = model.evaluate(x=test_data, y=test_labels)
-    np.save(f'smoothness_vector_of_base_thin_better_model.npy', alpha_vec)
+    np.save(f'Their/smoothness_vector_of_base_model.npy', alpha_vec)
     plot_vec(y=alpha_vec, title=f'Graph of base thin better model')
-    with open(f'scores_of_base_thin_model_new_reshape.txt', 'w') as f:
+    with open(f'Their/scores_of_base_model.txt', 'w') as f:
         f.write('\t'.join(model.metrics_names))
         f.write('\n')
         f.write(f'{score}')
@@ -112,7 +111,6 @@ def base_model_smoothness():
 
 def make_accuracy_and_loss_graph_for_models():
     x = [k for k in range(1, 5 + 1)]
-    trains = [100, 200, 300, 500, 1000, 1500, 2000, 3000, 4000, 5000, 10000, 15000]
     colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y', 'indigo', 'firebrick', 'lightgreen', 'peru', 'gold']
     accuracies = []
     losses = []
@@ -120,7 +118,7 @@ def make_accuracy_and_loss_graph_for_models():
         accuracy = []
         loss = []
         for i in range(5):
-            with open(fr'DanielDir/scores_of_model_{i}_and_{j}_train_data_new_reshape_and_base_better.txt', 'r') as f:
+            with open(fr'Their/scores_of_their_{i}_model_and_{j}_train.txt', 'r') as f:
                 lines = f.readlines()
                 scores = lines[1].replace('[', '').replace(']', '').split(',')
                 scores = [float(s) for s in scores]
@@ -137,7 +135,7 @@ def make_accuracy_and_loss_graph_for_models():
     for i in range(len(accuracies)):
         plt.plot(x, accuracies[i], color=colors[i], label=f'{trains[i]} train samples')
     plt.legend(loc='lower left')
-    plt.savefig(f'DanielDir/accuracy over models')
+    plt.savefig(f'accuracy over models')
     plt.close()
 
     plt.figure()
@@ -147,11 +145,12 @@ def make_accuracy_and_loss_graph_for_models():
     for i in range(len(accuracies)):
         plt.plot(x, losses[i], color=colors[i], label=f'{trains[i]} train samples')
     plt.legend(loc='upper left')
-    plt.savefig(f'DanielDir/loss over models')
+    plt.savefig(f'loss over models')
     plt.close()
 
 
 if __name__ == '__main__':
+    trains = [2000, 3000, 4000, 5000]
     # base_model_smoothness()
-    # main()
-    make_accuracy_and_loss_graph_for_models()
+    main()
+    # make_accuracy_and_loss_graph_for_models()
