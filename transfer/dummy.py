@@ -53,7 +53,7 @@ def main():
     for i in trains:
         models = build_fixed_layers_models(model)
 
-        for j in range(len(models)):
+        for j in [3]:
             x_train = train_data[0:i]
             y_train = train_labels[0:i]
             x_test = test_data
@@ -150,7 +150,7 @@ def make_accuracy_and_loss_graph_for_models():
 
 
 if __name__ == '__main__':
-    trains = [2000, 3000, 4000, 5000]
+    trains = [4000]
     # base_model_smoothness()
     main()
     # make_accuracy_and_loss_graph_for_models()
