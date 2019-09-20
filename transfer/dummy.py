@@ -160,7 +160,7 @@ def make_smoothness_graph_for_train(i):
 
     plt.figure()
     plt.xlabel('number of frozen layers')
-    plt.ylabel('accuracy')
+    plt.ylabel('smoothness index')
     plt.title(f'smoothness over layers with {i} train')
     for j in range(len(smoothness_list)):
         plt.plot(x, smoothness_list[j], color=colors[j], label=f'model {j}')
