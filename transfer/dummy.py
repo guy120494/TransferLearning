@@ -184,7 +184,7 @@ def make_smoothness_graph_for_model(j):
     plt.title(f'smoothness over layers for model {j}')
     for i in range(len(smoothness_list)):
         plt.plot(x, smoothness_list[i], color=colors[i], label=f'{trains[i]} train')
-    plt.legend(loc='lower left')
+    plt.legend(loc='lower right')
     plt.savefig(f'graphs/smoothness for model {j}')
     plt.close()
 
