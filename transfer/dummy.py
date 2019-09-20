@@ -165,7 +165,6 @@ def make_smoothness_graph_for_train(i):
     for j in range(len(smoothness_list)):
         plt.plot(x, smoothness_list[j], color=colors[j], label=f'model {j}')
     plt.legend(loc='lower right')
-    # plt.show()
     plt.savefig(f'graphs/smoothness for train {i}')
     plt.close()
 
@@ -186,8 +185,8 @@ def make_smoothness_graph_for_model(j):
     for i in range(len(smoothness_list)):
         plt.plot(x, smoothness_list[i], color=colors[i], label=f'{trains[i]} train')
     plt.legend(loc='lower left')
-    plt.show()
-    # plt.close()
+    plt.savefig(f'graphs/smoothness for model {j}')
+    plt.close()
 
 
 if __name__ == '__main__':
@@ -195,5 +194,8 @@ if __name__ == '__main__':
     # base_model_smoothness()
     # main()
     # make_accuracy_and_loss_graph_for_models()
-    for i in trains:
-        make_smoothness_graph_for_train(i)
+    for t in trains:
+        make_smoothness_graph_for_train(t)
+
+    for m in range(4):
+        make_smoothness_graph_for_model(m)
