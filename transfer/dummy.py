@@ -149,8 +149,51 @@ def make_accuracy_and_loss_graph_for_models():
     plt.close()
 
 
+def make_smoothness_graph_for_train(i):
+    smoothness_list = []
+    for j in range(4):
+        model_smoothness = np.load(f'Their/smoothness_vector_of_their_{j}_model_and_{i}_train.npy')
+        smoothness_list.append(model_smoothness.tolist())
+
+    x = [k for k in range(1, 8 + 1)]
+    colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y', 'indigo', 'firebrick', 'lightgreen', 'peru', 'gold']
+
+    plt.figure()
+    plt.xlabel('number of frozen layers')
+    plt.ylabel('accuracy')
+    plt.title(f'accuracy over models')
+    for j in range(len(smoothness_list)):
+        plt.plot(x, smoothness_list[j], color=colors[j], label=f'model {j}')
+    plt.legend(loc='lower right')
+    # plt.show()
+    plt.savefig(f'graphs/smoothness for train {i}')
+    plt.close()
+
+
+def make_smoothness_graph_for_model(j):
+    smoothness_list = []
+    for i in trains:
+        model_smoothness = np.load(f'Their/smoothness_vector_of_their_{j}_model_and_{i}_train.npy')
+        smoothness_list.append(model_smoothness.tolist())
+
+    x = [k for k in range(1, 8 + 1)]
+    colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y', 'indigo', 'firebrick', 'lightgreen', 'peru', 'gold']
+
+    plt.figure()
+    plt.xlabel('number of frozen layers')
+    plt.ylabel('smoothness index')
+    plt.title(f'smoothness over train')
+    for i in range(len(smoothness_list)):
+        plt.plot(x, smoothness_list[i], color=colors[i], label=f'{trains[i]} train')
+    plt.legend(loc='lower left')
+    plt.show()
+    # plt.close()
+
+
 if __name__ == '__main__':
-    trains = [4000]
+    trains = [1000, 2000, 3000, 4000, 5000, 10000, 20000]
     # base_model_smoothness()
-    main()
+    # main()
     # make_accuracy_and_loss_graph_for_models()
+    for i in trains:
+        make_smoothness_graph_for_train(i)
