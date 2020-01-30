@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.python.keras.models import Model
 
-from transfer.datasets.data_builder import get_mnist_compatible_cifar10
+from transfer.datasets.data_builder import get_mnist_compatible_cifar10, get_mnist_data
 from transfer.smoothness.random_forest import WaveletsForestRegressor
 
 
@@ -30,52 +30,172 @@ def build_fixed_layers_models(model: Model) -> List[Model]:
 def calc_smoothness(x, y):
     wfr = WaveletsForestRegressor(regressor='random_forest', criterion='mse', depth=9, trees=5)
     wfr.fit(x, y)
-    alpha, n_wavelets, errors = wfr.evaluate_smoothness()
+    alpha, n_wavelets, errors = wfr.evaluate_smoothness(m=100)
     return alpha
 
 
 def plot_vec(x=0, y=None, title='', xaxis='', yaxis=''):
     if x == 0:
         x = range(1, len(y) + 1)
+    a = plt.figure()
     plt.plot(x, y)
     plt.title(title)
     plt.xlabel(xaxis)
     plt.ylabel(yaxis)
-    plt.show()
+    # plt.show()
+    a.savefig(f'{title}')
 
 
 def main():
-    model: Model = tf.keras.models.load_model('../base_model.h5')
+    # model: Model = tf.keras.models.load_model(r'../base_model.h5')
     _, train_data, train_labels, test_data, test_labels = get_mnist_compatible_cifar10()
-
-    for i in range(10000, train_data.shape[0] + 1, 10000):
+    model: Model = tf.keras.models.load_model(r'Their/TheirModel.h5')
+    for i in trains:
         models = build_fixed_layers_models(model)
 
-        for j in range(len(models)):
+        for j in [3]:
             x_train = train_data[0:i]
             y_train = train_labels[0:i]
             x_test = test_data
             y_test = test_labels
             alpha_vec = np.zeros((len(model.layers),))
-            models[j].fit(x=x_train, y=y_train, batch_size=256, epochs=30, verbose=2)
-            for idx, layer in enumerate(models[j].layers):
+            current_model = models[j]
+            current_model.fit(x=x_train, y=y_train, batch_size=64, epochs=100, verbose=2)
+            for idx, layer in enumerate(current_model.layers):
                 print('Calculating smoothness parameters for layer ' + str(idx) + '.')
-                get_layer_output = tf.keras.backend.function([model.layers[0].input],
-                                                                     [model.layers[idx].output])
-                layer_output = get_layer_output([x_train])[0]
-                alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
-                                                 y_train)
+                get_layer_output = tf.keras.backend.function([current_model.layers[0].input],
+                                                             [current_model.layers[idx].output])
+                layer_output = get_layer_output([train_data])[0]
+                # alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
+                #                                  train_labels[0:20000])
+                alpha_vec[idx] = calc_smoothness(layer_output.reshape(layer_output.shape[0],
+                                                                      np.prod(layer_output.shape[1:])),
+                                                 train_labels)
 
-            score = models[j].evaluate(x=x_test, y=y_test)
-            np.save(f'smoothness_vector_of_model_{j}_and_{i}_train_data.npy', alpha_vec)
+            score = current_model.evaluate(x=x_test, y=y_test)
+            np.save(f'Their/smoothness_vector_of_their_{j}_model_and_{i}_train.npy', alpha_vec)
+            # plot_vec(y=alpha_vec, title=f'Graph of model {j} and {i} train and base better')
 
-            models[j].save(f'model_{j}_and_{i}_train_data.h5')
+            current_model.save(f'Their/their_{j}_model_and_{i}_train.h5')
 
-            with open(f'scores_of_model_{j}_and_{i}_train_data.txt', 'w') as f:
-                f.write('\t'.join(models[j].metrics_names))
+            with open(f'Their/scores_of_their_{j}_model_and_{i}_train.txt', 'w') as f:
+                f.write('\t'.join(current_model.metrics_names))
                 f.write('\n')
                 f.write(f'{score}')
 
 
+def base_model_smoothness():
+    # model: Model = tf.keras.models.load_model(r'base-model-thin-better.h5')
+    model: Model = tf.keras.models.load_model(r'Their/TheirModel.h5')
+    _, train_data, train_labels, test_data, test_labels = get_mnist_data()
+    # train_data = train_data[0:20000]
+    # train_labels = train_labels[0:20000]
+    alpha_vec = np.zeros((len(model.layers),))
+    for idx, layer in enumerate(model.layers):
+        print('Calculating smoothness parameters for layer ' + str(idx) + '.')
+        get_layer_output = tf.keras.backend.function([model.layers[0].input],
+                                                     [model.layers[idx].output])
+        layer_output = get_layer_output([train_data])[0]
+        # alpha_vec[idx] = calc_smoothness(layer_output.reshape(-1, layer_output.shape[0]).transpose(),
+        #                                  train_labels)
+        alpha_vec[idx] = calc_smoothness(layer_output.reshape(layer_output.shape[0], np.prod(layer_output.shape[1:])),
+                                         train_labels)
+    score = model.evaluate(x=test_data, y=test_labels)
+    np.save(f'Their/smoothness_vector_of_base_model.npy', alpha_vec)
+    plot_vec(y=alpha_vec, title=f'Graph of base thin better model')
+    with open(f'Their/scores_of_base_model.txt', 'w') as f:
+        f.write('\t'.join(model.metrics_names))
+        f.write('\n')
+        f.write(f'{score}')
+
+
+def make_accuracy_and_loss_graph_for_models():
+    x = [k for k in range(1, 5 + 1)]
+    colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y', 'indigo', 'firebrick', 'lightgreen', 'peru', 'gold']
+    accuracies = []
+    losses = []
+    for j in trains:
+        accuracy = []
+        loss = []
+        for i in range(5):
+            with open(fr'Their/scores_of_their_{i}_model_and_{j}_train.txt', 'r') as f:
+                lines = f.readlines()
+                scores = lines[1].replace('[', '').replace(']', '').split(',')
+                scores = [float(s) for s in scores]
+                loss.append(scores[0])
+                accuracy.append(scores[1])
+
+        accuracies.append(accuracy)
+        losses.append(loss)
+
+    plt.figure()
+    plt.xlabel('number of frozen layers')
+    plt.ylabel('accuracy')
+    plt.title(f'accuracy over models')
+    for i in range(len(accuracies)):
+        plt.plot(x, accuracies[i], color=colors[i], label=f'{trains[i]} train samples')
+    plt.legend(loc='lower left')
+    plt.savefig(f'accuracy over models')
+    plt.close()
+
+    plt.figure()
+    plt.xlabel('number of frozen layers')
+    plt.ylabel('loss')
+    plt.title(f'loss over models')
+    for i in range(len(accuracies)):
+        plt.plot(x, losses[i], color=colors[i], label=f'{trains[i]} train samples')
+    plt.legend(loc='upper left')
+    plt.savefig(f'loss over models')
+    plt.close()
+
+
+def make_smoothness_graph_for_train(i):
+    smoothness_list = []
+    for j in range(4):
+        model_smoothness = np.load(f'Their/smoothness_vector_of_their_{j}_model_and_{i}_train.npy')
+        smoothness_list.append(model_smoothness.tolist())
+
+    x = [k for k in range(1, 8 + 1)]
+    colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y', 'indigo', 'firebrick', 'lightgreen', 'peru', 'gold']
+
+    plt.figure()
+    plt.xlabel('number of frozen layers')
+    plt.ylabel('smoothness index')
+    plt.title(f'smoothness over layers with {i} train')
+    for j in range(len(smoothness_list)):
+        plt.plot(x, smoothness_list[j], color=colors[j], label=f'model {j}')
+    plt.legend(loc='lower right')
+    plt.savefig(f'graphs/smoothness for train {i}')
+    plt.close()
+
+
+def make_smoothness_graph_for_model(j):
+    smoothness_list = []
+    for i in trains:
+        model_smoothness = np.load(f'Their/smoothness_vector_of_their_{j}_model_and_{i}_train.npy')
+        smoothness_list.append(model_smoothness.tolist())
+
+    x = [k for k in range(1, 8 + 1)]
+    colors = ['r', 'g', 'b', 'c', 'm', 'k', 'y', 'indigo', 'firebrick', 'lightgreen', 'peru', 'gold']
+
+    plt.figure()
+    plt.xlabel('number of frozen layers')
+    plt.ylabel('smoothness index')
+    plt.title(f'smoothness over layers for model {j}')
+    for i in range(len(smoothness_list)):
+        plt.plot(x, smoothness_list[i], color=colors[i], label=f'{trains[i]} train')
+    plt.legend(loc='lower right')
+    plt.savefig(f'graphs/smoothness for model {j}')
+    plt.close()
+
+
 if __name__ == '__main__':
-    main()
+    trains = [1000, 2000, 3000, 4000, 5000, 10000, 20000]
+    # base_model_smoothness()
+    # main()
+    # make_accuracy_and_loss_graph_for_models()
+    for t in trains:
+        make_smoothness_graph_for_train(t)
+
+    for m in range(4):
+        make_smoothness_graph_for_model(m)
